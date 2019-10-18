@@ -27,6 +27,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import java.awt.Font;
 
 public class LogTable extends JTable implements FocusListener, ActionListener
 {
@@ -49,6 +50,9 @@ public class LogTable extends JTable implements FocusListener, ActionListener
     public LogTable(LogFilterTableModel tablemodel, LogFilterMain filterMain)
     {
         super(tablemodel);
+        setFont(new Font("Consolas", Font.PLAIN, 12));
+        setBackground(new Color(255, 0, 204));
+  
         m_LogFilterMain = filterMain;
         m_strHighlight       = "";
         m_strPidShow         = "";
@@ -95,7 +99,7 @@ public class LogTable extends JTable implements FocusListener, ActionListener
         setAutoscrolls(false);
 //        setRequestFocusEnabled(false);
 
-//        setGridColor(TABLE_GRID_COLOR);
+        setGridColor(new Color(189, 147, 249));
         setIntercellSpacing(new Dimension(0, 0));
         // turn off grid painting as we'll handle this manually in order to paint
         // grid lines over the entire viewport.
@@ -498,15 +502,19 @@ public class LogTable extends JTable implements FocusListener, ActionListener
             LogInfo logInfo = ((LogFilterTableModel)getModel()).getRow(row);
             c.setFont(getFont().deriveFont(m_fFontSize));
             c.setForeground(logInfo.m_TextColor);
+            //Setting Selected (Highlighted) Log. (DRACULA)
+            
+            c.setBackground(new Color(68 ,71 ,90));
             if(isSelected)
             {
                 if(logInfo.m_bMarked)
-                    c.setBackground(new Color(LogColor.COLOR_BOOKMARK2));
+
+                    c.setBackground(new Color(242, 242, 242));
             }
             else if(logInfo.m_bMarked)
-                c.setBackground(new Color(LogColor.COLOR_BOOKMARK));
+                c.setBackground(new Color(242, 242, 242));
             else
-                c.setBackground(Color.WHITE);
+                c.setBackground(new Color(40,42, 54));
 
             return c;
         }
