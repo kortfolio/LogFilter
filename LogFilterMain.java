@@ -71,6 +71,18 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.Color;
+import javax.swing.border.TitledBorder;
+import javax.swing.UIManager;
+import javax.swing.border.SoftBevelBorder;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.EmptyBorder;
+import java.awt.Panel;
+import java.awt.LayoutManager;
+import javax.swing.DefaultComboBoxModel;
+import java.awt.Label;
+import javax.swing.ImageIcon;
+import java.awt.SystemColor;
 
 public class LogFilterMain extends JFrame implements INotiEvent
 {
@@ -129,9 +141,6 @@ public class LogFilterMain extends JFrame implements INotiEvent
     LogFilterTableModel       m_tmLogTableModel;
 //    TagFilterTableModel         m_tmTagTableModel;
     boolean                   m_bUserFilter;
-    
-    //Word Filter, tag filter
-    JTextField                m_tfHighlight;
     JTextField                m_tfFindWord;
     JTextField                m_tfRemoveWord;
     JTextField                m_tfShowTag;
@@ -153,7 +162,6 @@ public class LogFilterMain extends JFrame implements INotiEvent
     JCheckBox                 m_chkEnableRemoveTag;
     JCheckBox                 m_chkEnableShowPid;
     JCheckBox                 m_chkEnableShowTid;
-    JCheckBox                 m_chkEnableHighlight;
 
     //Log filter
     JCheckBox                 m_chkVerbose;
@@ -175,9 +183,6 @@ public class LogFilterMain extends JFrame implements INotiEvent
     JCheckBox                 m_chkClmMessage;
     
     JTextField                m_tfFontSize;
-//    JTextField                  m_tfProcessCmd;
-    JComboBox                 m_comboEncode;
-    JComboBox                 m_jcFontType;
     JButton                   m_btnRun;
     JButton                   m_btnClear;
     JToggleButton             m_tbtnPause;
@@ -307,7 +312,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
 
 //        if(m_nWindState == JFrame.MAXIMIZED_BOTH)
 //        else
-            setSize(m_nWinWidth, m_nWinHeight);
+            setSize(1100, 593);
             setExtendedState( m_nWindState );
         setMinimumSize(new Dimension(MIN_WIDTH, MIN_HEIGHT));
     }
@@ -395,7 +400,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
             else
             {
                 LogColor.COLOR_HIGHLIGHT = new String[1];
-                LogColor.COLOR_HIGHLIGHT[0] = "2222";
+                LogColor.COLOR_HIGHLIGHT[0] = "f";
             }
         }
         catch(Exception e)
@@ -409,16 +414,16 @@ public class LogFilterMain extends JFrame implements INotiEvent
         try
         {
             Properties p = new Properties();
-
-            p.setProperty(INI_COLOR_0, "0x" + Integer.toHexString(LogColor.COLOR_0).toUpperCase());
-            p.setProperty(INI_COLOR_1, "0x" + Integer.toHexString(LogColor.COLOR_1).toUpperCase());
-            p.setProperty(INI_COLOR_2, "0x" + Integer.toHexString(LogColor.COLOR_2).toUpperCase());
-            p.setProperty(INI_COLOR_3, "0x" + Integer.toHexString(LogColor.COLOR_3).toUpperCase());
-            p.setProperty(INI_COLOR_4, "0x" + Integer.toHexString(LogColor.COLOR_4).toUpperCase());
-            p.setProperty(INI_COLOR_5, "0x" + Integer.toHexString(LogColor.COLOR_5).toUpperCase());
-            p.setProperty(INI_COLOR_6, "0x" + Integer.toHexString(LogColor.COLOR_6).toUpperCase());
-            p.setProperty(INI_COLOR_7, "0x" + Integer.toHexString(LogColor.COLOR_7).toUpperCase());
-            p.setProperty(INI_COLOR_8, "0x" + Integer.toHexString(LogColor.COLOR_8).toUpperCase());
+            
+            p.setProperty(INI_COLOR_0, "0x00F8F8F2");
+            p.setProperty(INI_COLOR_1, "0x00F8F8F2");
+            p.setProperty(INI_COLOR_2, "0x00F8F8F2");
+            p.setProperty(INI_COLOR_3, "0x00FF5555");
+            p.setProperty(INI_COLOR_4, "0x00F1FA8C");
+            p.setProperty(INI_COLOR_5, "0x00F8F8F2");           
+            p.setProperty(INI_COLOR_6, "0x0050FA7B");
+            p.setProperty(INI_COLOR_7, "0x008BE9FD");
+            p.setProperty(INI_COLOR_8, "0x00FF5555");
 
             if(LogColor.COLOR_HIGHLIGHT != null)
             {
@@ -447,14 +452,12 @@ public class LogFilterMain extends JFrame implements INotiEvent
             // Key 값 읽기
             String strFontType = p.getProperty(INI_FONT_TYPE);
             if(strFontType != null && strFontType.length() > 0)
-                m_jcFontType.setSelectedItem(p.getProperty(INI_FONT_TYPE));
+            //    m_jcFontType.setSelectedItem(p.getProperty(INI_FONT_TYPE));
             m_tfFindWord.setText(p.getProperty(INI_WORD_FIND));
             m_tfRemoveWord.setText(p.getProperty(INI_WORD_REMOVE));
             m_tfShowTag.setText(p.getProperty(INI_TAG_SHOW));
             m_tfRemoveTag.setText(p.getProperty(INI_TAG_REMOVE));
-            m_tfShowPid.setText(p.getProperty(INI_PID_SHOW));
             m_tfShowTid.setText(p.getProperty(INI_TID_SHOW));
-            m_tfHighlight.setText(p.getProperty(INI_HIGHLIGHT));
             m_nWinWidth  = Integer.parseInt( p.getProperty( INI_WIDTH ));
             m_nWinHeight = Integer.parseInt( p.getProperty( INI_HEIGHT ));
             m_nWindState = Integer.parseInt( p.getProperty( INI_WINDOW_STATE ));
@@ -481,14 +484,14 @@ public class LogFilterMain extends JFrame implements INotiEvent
             
             Properties p = new Properties();
 //            p.setProperty( INI_LAST_DIR, m_strLastDir );
-            p.setProperty(INI_FONT_TYPE,   (String)m_jcFontType.getSelectedItem());
+          //  p.setProperty(INI_FONT_TYPE,   (String)m_jcFontType.getSelectedItem());
             p.setProperty(INI_WORD_FIND,   m_tfFindWord.getText());
             p.setProperty(INI_WORD_REMOVE, m_tfRemoveWord.getText());
             p.setProperty(INI_TAG_SHOW,    m_tfShowTag.getText());
             p.setProperty(INI_TAG_REMOVE,  m_tfRemoveTag.getText());
             p.setProperty(INI_PID_SHOW,    m_tfShowPid.getText());
             p.setProperty(INI_TID_SHOW,    m_tfShowTid.getText());
-            p.setProperty(INI_HIGHLIGHT,   m_tfHighlight.getText());
+      //      p.setProperty(INI_HIGHLIGHT,   m_tfHighlight.getText());
             p.setProperty(INI_WIDTH,       "" + m_nWinWidth);
             p.setProperty(INI_HEIGHT,      "" + m_nWinHeight);
             p.setProperty(INI_WINDOW_STATE,"" + m_nWindState);
@@ -515,43 +518,31 @@ public class LogFilterMain extends JFrame implements INotiEvent
 
     void addDesc()
     {
-        addDesc(VERSION);
-        addDesc("");
-        addDesc("Version 1.8 : java -jar LogFilter_xx.jar [filename] 추가");
-        addDesc("Version 1.7 : copy시 보이는 column만 clipboard에 복사(Line 제외)");
-        addDesc("Version 1.6 : cmd콤보박스 길이 고정");
-        addDesc("Version 1.5 : Highlight color list추가()");
-        addDesc("   - LogFilterColor.ini 에 카운트와 값 넣어 주시면 됩니다.");
-        addDesc("   - ex)INI_HIGILIGHT_COUNT=2");
-        addDesc("   -    INI_COLOR_HIGILIGHT_0=0x2222");
-        addDesc("   -    INI_COLOR_HIGILIGHT_1=0x00FF");
-        addDesc("Version 1.4 : 창크기 저장");
-        addDesc("Version 1.3 : recent file 및 open메뉴추가");
-        addDesc("Version 1.2 : Tid 필터 추가");
-        addDesc("Version 1.1 : Level F 추가");
-        addDesc("Version 1.0 : Pid filter 추가");
-        addDesc("Version 0.9 : Font type 추가");
-        addDesc("Version 0.8 : 필터체크 박스 추가");
-        addDesc("Version 0.7 : 커널로그 파싱/LogFilter.ini에 컬러정의(0~7)");
-        addDesc("Version 0.6 : 필터 대소문 무시");
-        addDesc("Version 0.5 : 명령어 ini파일로 저장");
-        addDesc("Version 0.4 : add thread option, filter 저장");
-        addDesc("Version 0.3 : 단말 선택 안되는 문제 수정");
-        addDesc("");
-        addDesc("[Tag]");
-        addDesc("Alt+L/R Click : Show/Remove tag");
-        addDesc("");
-        addDesc("[Bookmark]");
-        addDesc("Ctrl+F2/double click: bookmark toggle");
-        addDesc("F2 : pre bookmark");
-        addDesc("F3 : next bookmark");
-        addDesc("");
-        addDesc("[Copy]");
-        addDesc("Ctrl+c : row copy");
-        addDesc("right click : cloumn copy");
-        addDesc("");
-        addDesc("[New version]");
-        addDesc("http://blog.naver.com/iookill/140135139931");
+    	
+        addDesc("Dracula Theme added by Mark Kang");    
+addDesc(" ");
+addDesc(" ");
+addDesc(" ");
+addDesc(" ");
+addDesc(" ");
+addDesc(" ");
+addDesc(" ");
+addDesc(" ");
+addDesc(" ");
+addDesc(" ");
+addDesc(" ");
+addDesc(" ");
+addDesc(" ");
+addDesc(" ");
+addDesc(" ");
+addDesc(" ");
+addDesc(" ");
+addDesc(" ");
+addDesc(" ");
+addDesc(" ");
+
+
+
     }
 
     /**
@@ -615,6 +606,8 @@ public class LogFilterMain extends JFrame implements INotiEvent
 //        jp.add(m_scrollVTagBar, BorderLayout.WEST);
 
         m_ipIndicator = new IndicatorPanel(this);
+        m_ipIndicator.setBackground(Color.BLACK);
+        m_ipIndicator.setForeground(new Color(255, 255, 255));
         m_ipIndicator.setData(m_arLogInfoAll, m_hmBookmarkAll, m_hmErrorAll);
         jp.add(m_ipIndicator, BorderLayout.CENTER);
         return jp;
@@ -623,14 +616,26 @@ public class LogFilterMain extends JFrame implements INotiEvent
     Component getCmdPanel()
     {
         JPanel jpOptionDevice = new JPanel();
+        jpOptionDevice.setPreferredSize(new Dimension(300, 100));
         jpOptionDevice.setBackground(new Color(60,69,86));
-        jpOptionDevice.setBorder(BorderFactory.createTitledBorder("Device select"));
+        jpOptionDevice.setForeground(new Color(189,147,249));
+
+        jpOptionDevice.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Device Selection", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(189, 147, 249)));        
         jpOptionDevice.setLayout(new BorderLayout());
 //        jpOptionDevice.setPreferredSize(new Dimension(200, 100));
 
         JPanel jpCmd = new JPanel();
         jpCmd.setBackground(new Color(60,69,86));
+        
+        //Combobox UI
+  
         m_comboDeviceCmd = new JComboBox();
+        m_comboDeviceCmd.setModel(new DefaultComboBoxModel(new String[] {"Android"}));
+      //  m_comboDeviceCmd.setIgnoreRepaint(true);
+        m_comboDeviceCmd.setBorder(null);
+        //m_comboDeviceCmd.setOpaque(true);
+        m_comboDeviceCmd.setForeground(Color.BLACK);
+     //   m_comboDeviceCmd.setBackground(new Color(37,37,37));     
         m_comboDeviceCmd.addItem(COMBO_ANDROID);
 //        m_comboDeviceCmd.addItem(COMBO_IOS);
 //        m_comboDeviceCmd.addItem(CUSTOM_COMMAND);
@@ -652,16 +657,24 @@ public class LogFilterMain extends JFrame implements INotiEvent
         });
 
         final DefaultListModel listModel = new DefaultListModel();
-        m_btnDevice = new JButton("OK");
+        m_btnDevice = new JButton("SEARCH");
+        m_btnDevice.setFont(new Font("Arial Black", Font.BOLD, 12));
+        m_btnDevice.setForeground(Color.WHITE);
+        m_btnDevice.setBackground(new Color(37,37,37));
+        m_btnDevice.setOpaque(true);
+        m_btnDevice.setBorderPainted(false);
         m_btnDevice.setMargin(new Insets(0, 0, 0, 0));
-        m_btnDevice.addActionListener(m_alButtonListener);
 
+        m_btnDevice.addActionListener(m_alButtonListener);
+   
         jpCmd.add(m_comboDeviceCmd);
         jpCmd.add(m_btnDevice);
 
         jpOptionDevice.add(jpCmd, BorderLayout.NORTH);
 
         m_lDeviceList = new JList(listModel);
+        m_lDeviceList.setVisibleRowCount(3);
+        m_lDeviceList.setForeground(new Color(248, 248, 242));
         m_lDeviceList.setBackground(new Color(60,69,86));
         JScrollPane vbar = new JScrollPane(m_lDeviceList);
         vbar.setPreferredSize(new Dimension(100,50));
@@ -762,7 +775,6 @@ public class LogFilterMain extends JFrame implements INotiEvent
 
     void addChangeListener()
     {
-        m_tfHighlight.getDocument().addDocumentListener(m_dlFilterListener);
         m_tfFindWord.getDocument().addDocumentListener(m_dlFilterListener);
         m_tfRemoveWord.getDocument().addDocumentListener(m_dlFilterListener);
         m_tfShowTag.getDocument().addDocumentListener(m_dlFilterListener);
@@ -776,7 +788,6 @@ public class LogFilterMain extends JFrame implements INotiEvent
         m_chkEnableShowTid.addItemListener(m_itemListener);
         m_chkEnableShowTag.addItemListener(m_itemListener);
         m_chkEnableRemoveTag.addItemListener(m_itemListener);
-        m_chkEnableHighlight.addItemListener(m_itemListener);
 
         m_chkVerbose.addItemListener(m_itemListener);
         m_chkDebug.addItemListener(m_itemListener);
@@ -813,97 +824,203 @@ public class LogFilterMain extends JFrame implements INotiEvent
     Component getFilterPanel()
     {
         m_chkEnableFind         = new JCheckBox();
+        m_chkEnableFind.setBackground(new Color(60,69,86));
         m_chkEnableRemove       = new JCheckBox();
+        m_chkEnableRemove.setBackground(new Color(60,69,86));
         m_chkEnableShowTag      = new JCheckBox();
+        m_chkEnableShowTag.setBackground(new Color(60,69,86));
         m_chkEnableRemoveTag    = new JCheckBox();
+        m_chkEnableRemoveTag.setBackground(new Color(60,69,86));
         m_chkEnableShowPid      = new JCheckBox();
+        m_chkEnableShowPid.setBackground(new Color(60,69,86));
         m_chkEnableShowTid      = new JCheckBox();
-        m_chkEnableFind.setSelected(true);
-        m_chkEnableRemove.setSelected(true);
-        m_chkEnableShowTag.setSelected(true);
-        m_chkEnableRemoveTag.setSelected(true);
-        m_chkEnableShowPid.setSelected(true);
-        m_chkEnableShowTid.setSelected(true);
+        m_chkEnableShowTid.setBackground(new Color(60,69,86));
 
+        //Text Field
+        
         m_tfFindWord    = new JTextField();
+        m_tfFindWord.setBorder(new EmptyBorder(5, 5, 5, 5));
+        m_tfFindWord.setForeground(Color.WHITE);
+        m_tfFindWord.setBackground(new Color(37,37,37));
+      
+        
         m_tfRemoveWord  = new JTextField();
+        m_tfRemoveWord.setBorder(new EmptyBorder(5, 5, 5, 5));
+        m_tfRemoveWord.setForeground(Color.WHITE);
+        m_tfRemoveWord.setBackground(new Color(37,37,37));
+ 
         m_tfShowTag     = new JTextField();
+        m_tfShowTag.setBorder(new EmptyBorder(5, 5, 5, 5));
+        m_tfShowTag.setForeground(Color.WHITE);
+        m_tfShowTag.setBackground(new Color(37,37,37));
+        
         m_tfRemoveTag   = new JTextField();
+        m_tfRemoveTag.setBorder(new EmptyBorder(5, 5, 5, 5));
+        m_tfRemoveTag.setForeground(Color.WHITE);
+        m_tfRemoveTag.setBackground(new Color(37,37,37));
+        
         m_tfShowPid     = new JTextField();
+        m_tfShowPid.setBorder(new EmptyBorder(5, 5, 5, 5));
+        m_tfShowPid.setForeground(Color.WHITE);
+        m_tfShowPid.setBackground(new Color(37,37,37));
+        
         m_tfShowTid     = new JTextField();
+        m_tfShowTid.setSize(new Dimension(30, 0));
+        m_tfShowTid.setBorder(new EmptyBorder(5, 5, 5, 5));
         m_tfShowTid.setForeground(new Color(245, 255, 250));
-        m_tfShowTid.setBackground(new Color(60, 69, 86));
+        m_tfShowTid.setBackground(new Color(37,37,37));
+        
 
         JPanel jpMain = new JPanel(new BorderLayout());
 
         JPanel jpWordFilter = new JPanel(new BorderLayout());
+        jpWordFilter.setPreferredSize(new Dimension(0, 150));
         jpWordFilter.setBackground(new Color(60,69,86));
-        jpWordFilter.setBorder(BorderFactory.createTitledBorder("Word filter"));
+        jpWordFilter.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Text Filter", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(189, 147, 249)));        
 
         JPanel jpFind = new JPanel(new BorderLayout());
+        jpFind.setBorder(new EmptyBorder(5, 0, 5, 0));
         jpFind.setBackground(new Color(60,69,86));
         JLabel find = new JLabel();
+        find.setHorizontalAlignment(SwingConstants.LEFT);
+        find.setFont(new Font("Tahoma", Font.BOLD, 12));
         find.setForeground(new Color(245, 255, 250));
         find.setBackground(new Color(60,69,86));
-        find.setText("        Find : ");
+        find.setText("  INCLUDE  ");
         jpFind.add(find, BorderLayout.WEST);
         jpFind.add(m_tfFindWord, BorderLayout.CENTER);
         jpFind.add(m_chkEnableFind, BorderLayout.EAST);
 
         JPanel jpRemove = new JPanel(new BorderLayout());
+        jpRemove.setBorder(new EmptyBorder(5, 0, 5, 0));
         jpRemove.setBackground(new Color(60,69,86));
         JLabel remove = new JLabel();
+        
+        remove.setFont(new Font("Tahoma", Font.BOLD, 12));
         remove.setForeground(new Color(245, 255, 250));
-        remove.setText("Remove : ");
+        remove.setBackground(new Color(60,69,86));
+        remove.setText("  EXCLUDE  ");
         jpRemove.add(remove, BorderLayout.WEST);
         jpRemove.add(m_tfRemoveWord, BorderLayout.CENTER);
         jpRemove.add(m_chkEnableRemove, BorderLayout.EAST);
 
         jpWordFilter.add(jpFind, BorderLayout.NORTH);
         jpWordFilter.add(jpRemove);
+        
+        panel_1 = new JPanel((LayoutManager) null);
+        panel_1.setBackground(new Color(60, 69, 86));
+        jpRemove.add(panel_1, BorderLayout.SOUTH);
+        panel_1.setLayout(new BorderLayout());
 
-        jpMain.add(jpWordFilter, BorderLayout.NORTH);
+        jpMain.add(jpWordFilter, BorderLayout.CENTER);
+        
+        panel_3 = new JPanel();
+        panel_3.setBorder(new EmptyBorder(0, 0, 65, 0));
+        panel_3.setSize(new Dimension(200, 0));
+        panel_3.setBackground(new Color(60,69,86));
+        jpWordFilter.add(panel_3, BorderLayout.SOUTH);
+        //  for ( int i = 0; i < fonts.length; i++ )
+     //   {
+         //     m_jcFontType.addItem(fonts[i]);
+     //   }
+
+
+          JLabel jlFont = new JLabel("Font Size");
+          jlFont.setHorizontalAlignment(SwingConstants.LEFT);
+          panel_3.add(jlFont);
+          jlFont.setForeground(Color.WHITE);
+        m_tfFontSize = new JTextField(2);
+        m_tfFontSize.setToolTipText("");
+        m_tfFontSize.setForeground(Color.WHITE);
+        m_tfFontSize.setBackground(Color.BLACK);
+        panel_3.add(m_tfFontSize);
+        m_tfFontSize.setHorizontalAlignment(SwingConstants.RIGHT);
+        m_tfFontSize.setText("12");
+        
+                m_btnSetFont = new JButton("UPDATE");
+                panel_3.add(m_btnSetFont);
+                m_btnSetFont.setFont(new Font("Arial Black", Font.BOLD, 12));
+                m_btnSetFont.setForeground(Color.WHITE);
+                m_btnSetFont.setBackground(new Color(37,37,37));
+                m_btnSetFont.setOpaque(true);
+                m_btnSetFont.setBorderPainted(false);
+                m_btnSetFont.setMargin(new Insets(0, 0, 0, 0));
+                m_btnSetFont.addActionListener(m_alButtonListener);
+        
+                JLabel jlGoto = new JLabel("GO TO");
+                panel_3.add(jlGoto);
+                jlGoto.setForeground(new Color(245, 255, 250));
+        final JTextField tfGoto = new JTextField(6);
+        tfGoto.setForeground(Color.WHITE);
+        tfGoto.setBackground(Color.BLACK);
+        panel_3.add(tfGoto);
+        tfGoto.setHorizontalAlignment(SwingConstants.RIGHT);
+        tfGoto.addCaretListener(new CaretListener(){
+            public void caretUpdate(CaretEvent e)
+            {
+                try
+                {
+                    int nIndex = Integer.parseInt(tfGoto.getText()) - 1;
+                    m_tbLogTable.showRow(nIndex, false);
+                }
+                catch(Exception err)
+                {
+                }
+            }
+        });
 
         JPanel jpTagFilter = new JPanel(new GridLayout(4, 1));
+        jpTagFilter.setPreferredSize(new Dimension(350, 200));
+        jpTagFilter.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Tag Filter", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(189, 147, 249)));
         jpTagFilter.setForeground(new Color(245, 255, 250));
         jpTagFilter.setBackground(new Color(60, 69, 86));
-        jpTagFilter.setBorder(BorderFactory.createTitledBorder("Tag filter"));
 
         JPanel jpPid = new JPanel(new BorderLayout());
+        jpPid.setBorder(new EmptyBorder(5, 5, 5, 5));
         jpPid.setBackground(new Color(60, 69, 86));
-        JLabel pid = new JLabel();
-        pid.setForeground(new Color(245, 255, 250));
-        pid.setBackground(new Color(60, 69, 86));
-        pid.setText("         Pid : ");
-        jpPid.add(pid, BorderLayout.WEST);
-        jpPid.add(m_tfShowPid, BorderLayout.CENTER);
-        jpPid.add(m_chkEnableShowPid, BorderLayout.EAST);
+        
+	        JLabel pid = new JLabel();
+	        pid.setFont(new Font("Arial", Font.BOLD, 13));
+	        pid.setForeground(new Color(245, 255, 250));
+	        pid.setBackground(new Color(60, 69, 86));
+	        pid.setText("  PID          ");
+	        jpPid.add(pid, BorderLayout.WEST);
+	        jpPid.add(m_tfShowPid, BorderLayout.CENTER);
+	        jpPid.add(m_chkEnableShowPid, BorderLayout.EAST);
 
         JPanel jpTid = new JPanel(new BorderLayout());
+        jpTid.setBorder(new EmptyBorder(5, 5, 5, 5));
         jpTid.setBackground(new Color(60,69,86));
+        
         JLabel tid = new JLabel();
+        tid.setFont(new Font("Arial", Font.BOLD, 13));
         tid.setForeground(new Color(245, 255, 250));
         tid.setBackground(new Color(60, 69, 86));
-        tid.setText("         Tid : ");
+        tid.setText("  TID          ");
         jpTid.add(tid, BorderLayout.WEST);
         jpTid.add(m_tfShowTid, BorderLayout.CENTER);
         jpTid.add(m_chkEnableShowTid, BorderLayout.EAST);
 
         JPanel jpShow = new JPanel(new BorderLayout());
+        jpShow.setBorder(new EmptyBorder(5, 5, 5, 5));
         jpShow.setBackground(new Color(60,69,86));
+        
         JLabel show = new JLabel();
+        show.setFont(new Font("Arial", Font.BOLD, 13));
         show.setForeground(new Color(245, 255, 250));
         show.setBackground(new Color(60,69,86));
-        show.setText("     Show : ");
+        show.setText("  INCLUDE  ");
         jpShow.add(show, BorderLayout.WEST);
         jpShow.add(m_tfShowTag, BorderLayout.CENTER);
         jpShow.add(m_chkEnableShowTag, BorderLayout.EAST);
 
         JPanel jpRemoveTag = new JPanel(new BorderLayout());
+        jpRemoveTag.setBorder(new EmptyBorder(5, 5, 5, 5));
         jpRemoveTag.setBackground(new Color(60,69,86));
         JLabel removeTag = new JLabel();
+        removeTag.setFont(new Font("Arial", Font.BOLD, 13));
         removeTag.setForeground(new Color(245, 255, 250));
-        removeTag.setText("Remove : ");
+        removeTag.setText("  EXCLUDE ");
         jpRemoveTag.add(removeTag, BorderLayout.WEST);
         jpRemoveTag.add(m_tfRemoveTag, BorderLayout.CENTER);
         jpRemoveTag.add(m_chkEnableRemoveTag, BorderLayout.EAST);
@@ -913,133 +1030,21 @@ public class LogFilterMain extends JFrame implements INotiEvent
         jpTagFilter.add(jpShow);
         jpTagFilter.add(jpRemoveTag);
 
-        jpMain.add(jpTagFilter, BorderLayout.CENTER);
+        jpMain.add(jpTagFilter, BorderLayout.EAST);
 
         return jpMain;
     }
 
-    Component getHighlightPanel()
-    {
-        m_chkEnableHighlight   = new JCheckBox();
-        m_chkEnableHighlight.setSelected(true);
-
-        m_tfHighlight   = new JTextField();
-
-        JPanel jpMain = new JPanel(new BorderLayout());
-        jpMain.setBackground(new Color(60, 69, 86));
-        jpMain.setBorder(BorderFactory.createTitledBorder("Highlight"));
-
-        JLabel jlHighlight = new JLabel();
-        jlHighlight.setForeground(new Color(245, 255, 250));
-        jlHighlight.setText("Highlight : ");
-        jpMain.add(jlHighlight, BorderLayout.WEST);
-        jpMain.add(m_tfHighlight);
-        jpMain.add(m_chkEnableHighlight, BorderLayout.EAST);
-
-        return jpMain;
-    }
+//    Component getHighlightPanel()
+//    {
+//    }
 
     Component getCheckPanel()
     {
-        m_chkVerbose    = new JCheckBox();
-        m_chkVerbose.setForeground(new Color(242, 242, 242));
-        m_chkDebug      = new JCheckBox();
-        m_chkDebug.setForeground(new Color(242, 242, 242));
-        m_chkInfo       = new JCheckBox();
-        m_chkInfo.setForeground(new Color(242, 242, 242));
-        m_chkWarn       = new JCheckBox();
-        m_chkWarn.setForeground(new Color(242, 242, 242));
-        m_chkError      = new JCheckBox();
-        m_chkError.setForeground(new Color(242, 242, 242));
-        m_chkFatal      = new JCheckBox();
-        m_chkFatal.setForeground(new Color(242, 242, 242));
 
-        m_chkClmBookmark= new JCheckBox();
-        m_chkClmBookmark.setForeground(new Color(245, 255, 250));
-        m_chkClmBookmark.setBackground(new Color(255, 255, 255));
-        m_chkClmLine    = new JCheckBox();
-        m_chkClmLine.setForeground(new Color(245, 255, 250));
-        m_chkClmDate    = new JCheckBox();
-        m_chkClmDate.setForeground(new Color(245, 255, 250));
-        m_chkClmTime    = new JCheckBox();
-        m_chkClmTime.setForeground(new Color(245, 255, 250));
-        m_chkClmLogLV   = new JCheckBox();
-        m_chkClmLogLV.setForeground(new Color(245, 255, 250));
-        m_chkClmPid     = new JCheckBox();
-        m_chkClmPid.setForeground(new Color(245, 255, 250));
-        m_chkClmThread  = new JCheckBox();
-        m_chkClmThread.setForeground(new Color(245, 255, 250));
-        m_chkClmTag     = new JCheckBox();
-        m_chkClmTag.setForeground(new Color(245, 255, 250));
-        m_chkClmMessage = new JCheckBox();
-        m_chkClmMessage.setForeground(new Color(245, 255, 250));
 
         JPanel jpMain = new JPanel(new BorderLayout());
         jpMain.setForeground(new Color(0, 0, 205));
-
-        JPanel jpLogFilter = new JPanel();
-        jpLogFilter.setBackground(new Color(60, 69, 86));
-        jpLogFilter.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        jpLogFilter.setBorder(BorderFactory.createTitledBorder("Log filter"));
-        
-        m_chkVerbose.setText("Verbose");
-        m_chkVerbose.setSelected(true);
-        m_chkDebug.setText("Debug");
-        m_chkDebug.setSelected(true);
-        m_chkInfo.setText("Info");
-        m_chkInfo.setSelected(true);
-        m_chkWarn.setText("Warn");
-        m_chkWarn.setSelected(true);
-        m_chkError.setText("Error");
-        m_chkError.setSelected(true);
-        m_chkFatal.setText("Fatal");
-        m_chkFatal.setSelected(true);
-        jpLogFilter.add(m_chkVerbose);
-        jpLogFilter.add(m_chkDebug);
-        jpLogFilter.add(m_chkInfo);
-        jpLogFilter.add(m_chkWarn);
-        jpLogFilter.add(m_chkError);
-        jpLogFilter.add(m_chkFatal);
-
-        jpMain.add(jpLogFilter, BorderLayout.NORTH);
-
-        JPanel jpShowColumn = new JPanel();
-        //60, 69, 86)
-        
-        jpShowColumn.setBackground(new Color(60, 69, 86));
-        jpShowColumn.setForeground(new Color(144, 238, 144));
-        jpShowColumn.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        jpShowColumn.setBorder(BorderFactory.createTitledBorder("Show column"));
-        m_chkClmBookmark.setText("Mark");
-        m_chkClmBookmark.setToolTipText("Bookmark");
-        m_chkClmLine.setText("Line");
-        m_chkClmLine.setSelected(true);
-        m_chkClmDate.setText("Date");
-        m_chkClmDate.setSelected(true);
-        m_chkClmTime.setText("Time");
-        m_chkClmTime.setSelected(true);
-        m_chkClmLogLV.setText("LogLV");
-        m_chkClmLogLV.setSelected(true);
-        m_chkClmPid.setText("Pid");
-        m_chkClmPid.setSelected(true);
-        m_chkClmThread.setText("Thread");
-        m_chkClmThread.setSelected(true);
-        m_chkClmTag.setText("Tag");
-        m_chkClmTag.setSelected(true);
-        m_chkClmMessage.setText("Msg");
-        m_chkClmMessage.setSelected(true);
-        jpShowColumn.add(m_chkClmBookmark);
-        jpShowColumn.add(m_chkClmLine);
-        jpShowColumn.add(m_chkClmDate);
-        jpShowColumn.add(m_chkClmTime);
-        jpShowColumn.add(m_chkClmLogLV);
-        jpShowColumn.add(m_chkClmPid);
-        jpShowColumn.add(m_chkClmThread);
-        jpShowColumn.add(m_chkClmTag);
-        jpShowColumn.add(m_chkClmMessage);
-
-        jpMain.add(jpShowColumn, BorderLayout.CENTER);
-        jpMain.add(getHighlightPanel(), BorderLayout.SOUTH);
         return jpMain;
     }
 
@@ -1057,115 +1062,230 @@ public class LogFilterMain extends JFrame implements INotiEvent
     Component getOptionMenu()
     {
         JPanel optionMenu = new JPanel(new BorderLayout());
+        optionMenu.setBackground(new Color(60,69,86));
+        optionMenu.setForeground(new Color(37,37,37));
         JPanel optionWest = new JPanel();
+        FlowLayout flowLayout = (FlowLayout) optionWest.getLayout();
+        flowLayout.setAlignment(FlowLayout.RIGHT);
         optionWest.setBackground(new Color(60,69,86));
-
-        JLabel jlFontType = new JLabel("Font Type : ");
-        jlFontType.setForeground(new Color(245, 255, 250));
-        m_jcFontType = new JComboBox();
         String fonts[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-        m_jcFontType.addItem("Dialog");
-        for ( int i = 0; i < fonts.length; i++ )
-        {
-            m_jcFontType.addItem(fonts[i]);
-        }
-        m_jcFontType.addActionListener(m_alButtonListener);
-
-
-        JLabel jlFont = new JLabel("Font Size : ");
-        jlFont.setForeground(new Color(245, 255, 250));
-        m_tfFontSize = new JTextField(2);
-        m_tfFontSize.setHorizontalAlignment(SwingConstants.RIGHT);
-        m_tfFontSize.setText("12");
-
-        m_btnSetFont = new JButton("OK");
-        m_btnSetFont.setMargin(new Insets(0, 0, 0, 0));
-        m_btnSetFont.addActionListener(m_alButtonListener);
-
-        JLabel jlEncode = new JLabel("Text Encode : ");
-        jlEncode.setForeground(new Color(245, 255, 250));
-        m_comboEncode = new JComboBox();
-        m_comboEncode.addItem("UTF-8");
-        m_comboEncode.addItem("Local");
-
-        JLabel jlGoto = new JLabel("Goto : ");
-        jlGoto.setForeground(new Color(245, 255, 250));
-        final JTextField tfGoto = new JTextField(6);
-        tfGoto.setHorizontalAlignment(SwingConstants.RIGHT);
-        tfGoto.addCaretListener(new CaretListener(){
-            public void caretUpdate(CaretEvent e)
-            {
-                try
-                {
-                    int nIndex = Integer.parseInt(tfGoto.getText()) - 1;
-                    m_tbLogTable.showRow(nIndex, false);
-                }
-                catch(Exception err)
-                {
-                }
-            }
-        });
 
         JLabel jlProcessCmd = new JLabel("Cmd : ");
         jlProcessCmd.setForeground(new Color(245, 255, 250));
         m_comboCmd = new JComboBox();
         m_comboCmd.setPreferredSize( new Dimension( 180, 25) );
-//        m_comboCmd.setMaximumSize( m_comboCmd.getPreferredSize()  );
-//        m_comboCmd.setSize( 20000, m_comboCmd.getHeight() );
-//        m_comboCmd.addItem(ANDROID_THREAD_CMD);
-//        m_comboCmd.addItem(ANDROID_DEFAULT_CMD);
-//        m_comboCmd.addItem(ANDROID_RADIO_CMD);
-//        m_comboCmd.addItem(ANDROID_EVENT_CMD);
-//        m_comboCmd.addItem(ANDROID_CUSTOM_CMD);
-//        m_comboCmd.addItemListener(new ItemListener()
-//        {
-//            public void itemStateChanged(ItemEvent e)
-//            {
-//                if(e.getStateChange() != ItemEvent.SELECTED) return;
-//
-//                if (e.getItem().equals(ANDROID_CUSTOM_CMD)) {
-//                    m_comboCmd.setEditable(true);
-//                } else {
-//                    m_comboCmd.setEditable(false);
-//                }
-////                setProcessCmd(m_comboDeviceCmd.getSelectedIndex(), m_strSelectedDevice);
-//            }
-//        });
-
-        m_btnClear = new JButton("Clear");
-        m_btnClear.setMargin(new Insets(0, 0, 0, 0));
-        m_btnClear.setEnabled(false);
-        m_btnRun = new JButton("Run");
-        m_btnRun.setMargin(new Insets(0, 0, 0, 0));
-
-        m_tbtnPause = new JToggleButton("Pause");
-        m_tbtnPause.setMargin(new Insets(0, 0, 0, 0));
-        m_tbtnPause.setEnabled(false);
-        m_btnStop = new JButton("Stop");
-        m_btnStop.setMargin(new Insets(0, 0, 0, 0));
-        m_btnStop.setEnabled(false);
-        m_btnRun.addActionListener(m_alButtonListener);
-        m_btnStop.addActionListener(m_alButtonListener);
-        m_btnClear.addActionListener(m_alButtonListener);
-        m_tbtnPause.addActionListener(m_alButtonListener);
-
-        optionWest.add(jlFontType);
-        optionWest.add(m_jcFontType);
-        optionWest.add(jlFont);
-        optionWest.add(m_tfFontSize);
-        optionWest.add(m_btnSetFont);
-        optionWest.add(jlEncode);
-        optionWest.add(m_comboEncode);
-        optionWest.add(jlGoto);
-        optionWest.add(tfGoto);
         optionWest.add(jlProcessCmd);
         optionWest.add(m_comboCmd);
-        optionWest.add(m_btnClear);
-        optionWest.add(m_btnRun);
-        optionWest.add(m_tbtnPause);
-        optionWest.add(m_btnStop);
 
-        optionMenu.add(optionWest, BorderLayout.WEST);
+        optionMenu.add(optionWest, BorderLayout.NORTH);
+        
+        panel_2 = new JPanel();
+        optionWest.add(panel_2);
+        panel_2.setBackground(new Color(60, 69, 86));
+        
+        panel_2.setSize(new Dimension(0, 100));
+        //        m_comboCmd.setMaximumSize( m_comboCmd.getPreferredSize()  );
+        //        m_comboCmd.setSize( 20000, m_comboCmd.getHeight() );
+        //        m_comboCmd.addItem(ANDROID_THREAD_CMD);
+        //        m_comboCmd.addItem(ANDROID_DEFAULT_CMD);
+        //        m_comboCmd.addItem(ANDROID_RADIO_CMD);
+        //        m_comboCmd.addItem(ANDROID_EVENT_CMD);
+        //        m_comboCmd.addItem(ANDROID_CUSTOM_CMD);
+        //        m_comboCmd.addItemListener(new ItemListener()
+        //        {
+        //            public void itemStateChanged(ItemEvent e)
+        //            {
+        //                if(e.getStateChange() != ItemEvent.SELECTED) return;
+        //
+        //                if (e.getItem().equals(ANDROID_CUSTOM_CMD)) {
+        //                    m_comboCmd.setEditable(true);
+        //                } else {
+        //                    m_comboCmd.setEditable(false);
+        //                }
+        ////                setProcessCmd(m_comboDeviceCmd.getSelectedIndex(), m_strSelectedDevice);
+        //            }
+        //        });
+        
+                
+        
+                //START BUTTON UI
+                m_btnRun = new JButton("START");
+                panel_2.add(m_btnRun);
+                m_btnRun.setFont(new Font("Arial Black", Font.BOLD, 12));
+                m_btnRun.setForeground(Color.WHITE);
+                m_btnRun.setBackground(new Color(37,37,37));
+                m_btnRun.setOpaque(true);
+                m_btnRun.setBorderPainted(false);
+                m_btnRun.setMargin(new Insets(0, 0, 0, 0));
+                
+                
+                 
+                 m_tbtnPause = new JToggleButton("PAUSE");
+                 panel_2.add(m_tbtnPause);
+                 m_tbtnPause.setFont(new Font("Arial Black", Font.BOLD, 12));
+                 m_tbtnPause.setForeground(Color.WHITE);
+                 m_tbtnPause.setBackground(new Color(37,37,37));
+                 m_tbtnPause.setOpaque(true);
+                 m_tbtnPause.setBorderPainted(false);
+                 m_tbtnPause.setMargin(new Insets(0, 0, 0, 0));
+                 m_tbtnPause.setEnabled(false);
+                 
+                  
+                  m_btnStop = new JButton("STOP");
+                  panel_2.add(m_btnStop);
+                  m_btnStop.setFont(new Font("Arial Black", Font.BOLD, 12));
+                  m_btnStop.setForeground(Color.WHITE);
+                  m_btnStop.setBackground(new Color(37,37,37));
+                  m_btnStop.setOpaque(true);
+                  m_btnStop.setBorderPainted(false);
+                  m_btnStop.setMargin(new Insets(0, 0, 0, 0));
+                  m_btnStop.setEnabled(false);
+                  //END START BUTTON UI
+
+                  
+                  m_btnClear = new JButton("CLEAR");
+                  panel_2.add(m_btnClear);
+                  m_btnClear.setFont(new Font("Arial Black", Font.BOLD, 12));
+                  m_btnClear.setForeground(Color.WHITE);
+                  m_btnClear.setBackground(new Color(37,37,37));
+                  m_btnClear.setOpaque(true);
+                  m_btnClear.setBorderPainted(false);
+                  m_btnClear.setMargin(new Insets(0, 0, 0, 0));
+                  m_btnClear.setEnabled(false);
+                  m_btnClear.addActionListener(m_alButtonListener);
+                  m_btnStop.addActionListener(m_alButtonListener);
+                  m_tbtnPause.addActionListener(m_alButtonListener);
+                  
+                  
+                  m_btnRun.addActionListener(m_alButtonListener);
+                        
+                          m_chkClmLine    = new JCheckBox();
+                          
+                          m_chkClmLine.setForeground(new Color(245, 255, 250));
+                          m_chkClmLine.setBackground(new Color(60, 69, 86));
+                          
+                                  
+                                  m_chkClmDate    = new JCheckBox();
+                                  m_chkClmDate.setForeground(new Color(245, 255, 250));
+                                  
+                                          m_chkClmDate.setForeground(new Color(245, 255, 250));
+                                          m_chkClmDate.setBackground(new Color(60, 69, 86));
+                                          
+                                                  
+                                                  m_chkClmTime    = new JCheckBox();
+                                                  
+                                                      m_chkClmTime.setForeground(new Color(245, 255, 250));
+                                                      m_chkClmTime.setBackground(new Color(60, 69, 86));
+                                                      
+                                                              
+                                                              m_chkClmLogLV   = new JCheckBox();
+                                                              m_chkClmLogLV.setForeground(new Color(245, 255, 250));
+                                                              m_chkClmLogLV.setBackground(new Color(60, 69, 86));
+                                                              
+                                                                      
+                                                                      m_chkClmPid     = new JCheckBox();
+                                                                      
+                                                                      m_chkClmPid.setForeground(new Color(245, 255, 250));
+                                                                      m_chkClmPid.setBackground(new Color(60, 69, 86));
+                                                                      
+                                                                              m_chkClmThread  = new JCheckBox();
+                                                                              
+                                                                                      m_chkClmThread.setForeground(new Color(245, 255, 250));
+                                                                                      m_chkClmThread.setBackground(new Color(60, 69, 86));
+                                                                                      
+                                                                                              
+                                                                                              m_chkClmTag     = new JCheckBox();
+                                                                                              m_chkClmTag.setForeground(new Color(245, 255, 250));
+                                                                                              m_chkClmTag.setBackground(new Color(60, 69, 86));
+                                                                                              
+                                                                                                      m_chkClmMessage = new JCheckBox();
+                                                                                                      m_chkClmMessage.setForeground(new Color(245, 255, 250));
+                                                                                                      m_chkClmMessage.setBackground(new Color(60, 69, 86));
+                                                                                                      
+                                                                                                              JPanel jpShowColumn = new JPanel();
+                                                                                                              jpShowColumn.setFont(new Font("Arial Black", Font.BOLD, 14));
+                                                                                                              optionMenu.add(jpShowColumn, BorderLayout.WEST);
+                                                                                                              //60, 69, 86)
+                                                                                                              
+                                                                                                              jpShowColumn.setBackground(new Color(60, 69, 86));
+                                                                                                              jpShowColumn.setForeground(new Color(144, 238, 144));
+                                                                                                              jpShowColumn.setLayout(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+                                                                                                              jpShowColumn.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Log Column Settings", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(189, 147, 249)));
+                                                                                                                      m_chkClmLine.setText("Line");
+                                                                                                                      m_chkClmLine.setSelected(true);
+                                                                                                                      m_chkClmDate.setText("Date");
+                                                                                                                      m_chkClmDate.setSelected(true);
+                                                                                                                      m_chkClmTime.setText("Time");
+                                                                                                                      m_chkClmTime.setSelected(true);
+                                                                                                                      m_chkClmLogLV.setText("LogLV");
+                                                                                                                      m_chkClmLogLV.setSelected(true);
+                                                                                                                      m_chkClmPid.setText("Pid");
+                                                                                                                      m_chkClmPid.setSelected(true);
+                                                                                                                      m_chkClmThread.setText("Thread");
+                                                                                                                      m_chkClmThread.setSelected(true);
+                                                                                                                      m_chkClmTag.setText("Tag");
+                                                                                                                      m_chkClmTag.setSelected(true);
+                                                                                                                      m_chkClmMessage.setText("Msg");
+                                                                                                                      m_chkClmMessage.setSelected(true);
+                                                                                                                      jpShowColumn.add(m_chkClmLine);
+                                                                                                                      jpShowColumn.add(m_chkClmDate);
+                                                                                                                      jpShowColumn.add(m_chkClmTime);
+                                                                                                                      jpShowColumn.add(m_chkClmLogLV);
+                                                                                                                      jpShowColumn.add(m_chkClmPid);
+                                                                                                                      jpShowColumn.add(m_chkClmThread);
+                                                                                                                      jpShowColumn.add(m_chkClmTag);
+                                                                                                                      
+                                                                                                                              m_chkClmBookmark= new JCheckBox();
+                                                                                                                              m_chkClmBookmark.setForeground(new Color(245, 255, 250));
+                                                                                                                              m_chkClmBookmark.setBackground(new Color(60, 69, 86));
+                                                                                                                              
+                                                                                                                                      m_chkClmBookmark.setText("BookMark");
+                                                                                                                                      m_chkClmBookmark.setToolTipText("Bookmark");
+                                                                                                                                      jpShowColumn.add(m_chkClmBookmark);
+                                                                                                                      jpShowColumn.add(m_chkClmMessage);
+                                                                                                                      m_chkVerbose    = new JCheckBox();
+                                                                                                                      m_chkVerbose.setBackground(new Color(60, 69, 86));
+                                                                                                                      m_chkVerbose.setForeground(new Color(242, 242, 242));
+                                                                                                                      m_chkDebug      = new JCheckBox();
+                                                                                                                      m_chkDebug.setBackground(new Color(60, 69, 86));
+                                                                                                                      m_chkDebug.setForeground(new Color(242, 242, 242));
+                                                                                                                      m_chkInfo       = new JCheckBox();
+                                                                                                                      m_chkInfo.setBackground(new Color(60, 69, 86));
+                                                                                                                      m_chkInfo.setForeground(new Color(242, 242, 242));
+                                                                                                                      m_chkWarn       = new JCheckBox();
+                                                                                                                      m_chkWarn.setBackground(new Color(60, 69, 86));
+                                                                                                                      m_chkWarn.setForeground(new Color(242, 242, 242));
+                                                                                                                      m_chkError      = new JCheckBox();
+                                                                                                                      m_chkError.setBackground(new Color(60, 69, 86));
+                                                                                                                      m_chkError.setForeground(new Color(242, 242, 242));
+                                                                                                                      m_chkFatal      = new JCheckBox();
+                                                                                                                      m_chkFatal.setBackground(new Color(60, 69, 86));
+                                                                                                                      m_chkFatal.setForeground(new Color(242, 242, 242));
+                                                                                                                      
+                                                                                                                              JPanel jpLogFilter = new JPanel();
+                                                                                                                              optionMenu.add(jpLogFilter, BorderLayout.EAST);
+                                                                                                                              jpLogFilter.setBackground(new Color(60, 69, 86));
+                                                                                                                              jpLogFilter.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+                                                                                                                              jpLogFilter.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Log Display Settings", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(189, 147, 249)));
+                                                                                                                              
+                                                                                                                              m_chkVerbose.setText("Verbose");
+                                                                                                                              m_chkVerbose.setSelected(true);
+                                                                                                                              m_chkDebug.setText("Debug");
+                                                                                                                              m_chkDebug.setSelected(true);
+                                                                                                                              m_chkInfo.setText("Info");
+                                                                                                                              m_chkInfo.setSelected(true);
+                                                                                                                              m_chkWarn.setText("Warn");
+                                                                                                                              m_chkWarn.setSelected(true);
+                                                                                                                              m_chkError.setText("Error");
+                                                                                                                              m_chkError.setSelected(true);
+                                                                                                                              m_chkFatal.setText("Fatal");
+                                                                                                                              m_chkFatal.setSelected(true);
+                                                                                                                              jpLogFilter.add(m_chkVerbose);
+                                                                                                                              jpLogFilter.add(m_chkDebug);
+                                                                                                                              jpLogFilter.add(m_chkInfo);
+                                                                                                                              jpLogFilter.add(m_chkWarn);
+                                                                                                                              jpLogFilter.add(m_chkError);
+                                                                                                                              jpLogFilter.add(m_chkFatal);
         return optionMenu;
     }
 
@@ -1174,6 +1294,9 @@ public class LogFilterMain extends JFrame implements INotiEvent
         JPanel optionMain = new JPanel(new BorderLayout());
 
         optionMain.add(getOptionFilter(), BorderLayout.CENTER);
+        
+        panel = new Panel();
+        optionMain.add(panel, BorderLayout.NORTH);
         optionMain.add(getOptionMenu(), BorderLayout.SOUTH);
 
         return optionMain;
@@ -1192,6 +1315,8 @@ public class LogFilterMain extends JFrame implements INotiEvent
         m_tmLogTableModel = new LogFilterTableModel();
         m_tmLogTableModel.setData(m_arLogInfoAll);
         m_tbLogTable = new LogTable(m_tmLogTableModel, this);
+        m_tbLogTable.setForeground(new Color(255, 255, 255));
+        m_tbLogTable.setFont(new Font("Consolas", Font.PLAIN, 12));
         m_iLogParser = new LogCatParser();
         m_tbLogTable.setLogParser(m_iLogParser);
         
@@ -1200,6 +1325,8 @@ public class LogFilterMain extends JFrame implements INotiEvent
 
         m_scrollVBar = new JScrollPane(m_tbLogTable);
         m_scrollVBar.setBackground(new Color(60, 69, 86));
+        m_scrollVBar.setForeground(new Color(189,147,249));
+        
         //m_tpTab.addTab("Log", m_scrollVBar);
 
         return m_scrollVBar;
@@ -1246,11 +1373,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
                 try {
                     fstream = new FileInputStream(file);
                     in = new DataInputStream(fstream);
-                    if(m_comboEncode.getSelectedItem().equals("UTF-8"))
-                        br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-                    else
-                        br = new BufferedReader(new InputStreamReader(in));
-
+                       br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
                     String strLine;
 
                     setStatus("Parsing");
@@ -1412,8 +1535,8 @@ public class LogFilterMain extends JFrame implements INotiEvent
             m_tbLogTable.SetFilterShowTag(checkBox.isSelected() ? m_tfShowTag.getText() : "");
         if(checkBox.equals(m_chkEnableRemoveTag))
             m_tbLogTable.SetFilterRemoveTag(checkBox.isSelected() ? m_tfRemoveTag.getText() : "");
-        if(checkBox.equals(m_chkEnableHighlight))
-            m_tbLogTable.SetHighlight(checkBox.isSelected() ? m_tfHighlight.getText() : "");
+//        if(checkBox.equals(m_chkEnableHighlight))
+//            m_tbLogTable.SetHighlight(checkBox.isSelected() ? m_tfHighlight.getText() : "");
         m_nChangedFilter = STATUS_CHANGE;
         runFilter();
     }
@@ -1525,11 +1648,8 @@ public class LogFilterMain extends JFrame implements INotiEvent
                 try {
                     fstream = new FileInputStream(m_strLogFileName);
                     in = new DataInputStream(fstream);
-                    if(m_comboEncode.getSelectedItem().equals("UTF-8"))
-                        br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-                    else
-                        br = new BufferedReader(new InputStreamReader(in));
-
+                    br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+                
                     String strLine;
 
                     setTitle(m_strLogFileName);
@@ -1948,11 +2068,11 @@ public class LogFilterMain extends JFrame implements INotiEvent
             }
             else if(e.getSource().equals(m_tbtnPause))
                 pauseProcess();
-            else if(e.getSource().equals(m_jcFontType))
+         //   else if(e.getSource().equals(m_jcFontType))
             {
                 T.d("font = " + m_tbLogTable.getFont());
                 
-                m_tbLogTable.setFont(new Font((String)m_jcFontType.getSelectedItem(), Font.PLAIN, 12));
+             //   m_tbLogTable.setFont(new Font((String)m_jcFontType.getSelectedItem(), Font.PLAIN, 12));
                 m_tbLogTable.setFontSize(Integer.parseInt(m_tfFontSize.getText()));
             }
         }
@@ -2007,8 +2127,8 @@ public class LogFilterMain extends JFrame implements INotiEvent
                     m_tbLogTable.SetFilterShowTag(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
                 else if(arg0.getDocument().equals(m_tfRemoveTag.getDocument()) && m_chkEnableRemoveTag.isSelected())
                     m_tbLogTable.SetFilterRemoveTag(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
-                else if(arg0.getDocument().equals(m_tfHighlight.getDocument()) && m_chkEnableHighlight.isSelected())
-                    m_tbLogTable.SetHighlight(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
+               // else if(arg0.getDocument().equals(m_tfHighlight.getDocument()) && m_chkEnableHighlight.isSelected())
+                //    m_tbLogTable.SetHighlight(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
                 m_nChangedFilter = STATUS_CHANGE;
                 runFilter();
             }
@@ -2034,8 +2154,8 @@ public class LogFilterMain extends JFrame implements INotiEvent
                     m_tbLogTable.SetFilterShowTag(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
                 else if(arg0.getDocument().equals(m_tfRemoveTag.getDocument()) && m_chkEnableRemoveTag.isSelected())
                     m_tbLogTable.SetFilterRemoveTag(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
-                else if(arg0.getDocument().equals(m_tfHighlight.getDocument()) && m_chkEnableHighlight.isSelected())
-                    m_tbLogTable.SetHighlight(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
+//                else if(arg0.getDocument().equals(m_tfHighlight.getDocument()) && m_chkEnableHighlight.isSelected())
+//                    m_tbLogTable.SetHighlight(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
                 m_nChangedFilter = STATUS_CHANGE;
                 runFilter();
             }
@@ -2061,7 +2181,7 @@ public class LogFilterMain extends JFrame implements INotiEvent
                     m_tbLogTable.SetFilterShowTag(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
                 else if(arg0.getDocument().equals(m_tfRemoveTag.getDocument()) && m_chkEnableRemoveTag.isSelected())
                     m_tbLogTable.SetFilterRemoveTag(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
-                else if(arg0.getDocument().equals(m_tfHighlight.getDocument()) && m_chkEnableHighlight.isSelected())
+               // else if(arg0.getDocument().equals(m_tfHighlight.getDocument()) && m_chkEnableHighlight.isSelected())
                     m_tbLogTable.SetHighlight(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
                 m_nChangedFilter = STATUS_CHANGE;
                 runFilter();
@@ -2112,11 +2232,15 @@ public class LogFilterMain extends JFrame implements INotiEvent
                     || check.equals(m_chkEnableShowPid)
                     || check.equals(m_chkEnableShowTid)
                     || check.equals(m_chkEnableShowTag)
-                    || check.equals(m_chkEnableRemoveTag)
-                    || check.equals(m_chkEnableHighlight))
+                    || check.equals(m_chkEnableRemoveTag))
+              //      || check.equals(m_chkEnableHighlight))
                 useFilter(check);
         }
     };
+    private Panel panel;
+    private JPanel panel_1;
+    private JPanel panel_2;
+    private JPanel panel_3;
     
     public void openFileBrowser()
     {
