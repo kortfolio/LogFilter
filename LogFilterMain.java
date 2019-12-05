@@ -83,6 +83,8 @@ import javax.swing.DefaultComboBoxModel;
 import java.awt.Label;
 import javax.swing.ImageIcon;
 import java.awt.SystemColor;
+import javax.swing.JSplitPane;
+import org.eclipse.wb.swing.FocusTraversalOnArray;
 
 public class LogFilterMain extends JFrame implements INotiEvent
 {
@@ -145,23 +147,18 @@ public class LogFilterMain extends JFrame implements INotiEvent
     JTextField                m_tfRemoveWord;
     JTextField                m_tfShowTag;
     JTextField                m_tfRemoveTag;
-    JTextField                m_tfShowPid;
-    JTextField                m_tfShowTid;
     
     //Device
     JButton                   m_btnDevice;
     JList                     m_lDeviceList;
     JComboBox                 m_comboDeviceCmd;
     JComboBox                 m_comboCmd;
-    JButton                   m_btnSetFont;
 
     //Log filter enable/disable
     JCheckBox                 m_chkEnableFind;
     JCheckBox                 m_chkEnableRemove;
     JCheckBox                 m_chkEnableShowTag;
     JCheckBox                 m_chkEnableRemoveTag;
-    JCheckBox                 m_chkEnableShowPid;
-    JCheckBox                 m_chkEnableShowTid;
 
     //Log filter
     JCheckBox                 m_chkVerbose;
@@ -181,8 +178,6 @@ public class LogFilterMain extends JFrame implements INotiEvent
     JCheckBox                 m_chkClmThread;
     JCheckBox                 m_chkClmTag;
     JCheckBox                 m_chkClmMessage;
-    
-    JTextField                m_tfFontSize;
     JButton                   m_btnRun;
     JButton                   m_btnClear;
     JToggleButton             m_tbtnPause;
@@ -457,7 +452,6 @@ public class LogFilterMain extends JFrame implements INotiEvent
             m_tfRemoveWord.setText(p.getProperty(INI_WORD_REMOVE));
             m_tfShowTag.setText(p.getProperty(INI_TAG_SHOW));
             m_tfRemoveTag.setText(p.getProperty(INI_TAG_REMOVE));
-            m_tfShowTid.setText(p.getProperty(INI_TID_SHOW));
             m_nWinWidth  = Integer.parseInt( p.getProperty( INI_WIDTH ));
             m_nWinHeight = Integer.parseInt( p.getProperty( INI_HEIGHT ));
             m_nWindState = Integer.parseInt( p.getProperty( INI_WINDOW_STATE ));
@@ -489,8 +483,8 @@ public class LogFilterMain extends JFrame implements INotiEvent
             p.setProperty(INI_WORD_REMOVE, m_tfRemoveWord.getText());
             p.setProperty(INI_TAG_SHOW,    m_tfShowTag.getText());
             p.setProperty(INI_TAG_REMOVE,  m_tfRemoveTag.getText());
-            p.setProperty(INI_PID_SHOW,    m_tfShowPid.getText());
-            p.setProperty(INI_TID_SHOW,    m_tfShowTid.getText());
+          //  p.setProperty(INI_PID_SHOW,    m_tfShowPid.getText());
+        //    p.setProperty(INI_TID_SHOW,    m_tfShowTid.getText());
       //      p.setProperty(INI_HIGHLIGHT,   m_tfHighlight.getText());
             p.setProperty(INI_WIDTH,       "" + m_nWinWidth);
             p.setProperty(INI_HEIGHT,      "" + m_nWinHeight);
@@ -779,13 +773,9 @@ addDesc(" ");
         m_tfRemoveWord.getDocument().addDocumentListener(m_dlFilterListener);
         m_tfShowTag.getDocument().addDocumentListener(m_dlFilterListener);
         m_tfRemoveTag.getDocument().addDocumentListener(m_dlFilterListener);
-        m_tfShowPid.getDocument().addDocumentListener(m_dlFilterListener);
-        m_tfShowTid.getDocument().addDocumentListener(m_dlFilterListener);
 
         m_chkEnableFind.addItemListener(m_itemListener);
         m_chkEnableRemove.addItemListener(m_itemListener);
-        m_chkEnableShowPid.addItemListener(m_itemListener);
-        m_chkEnableShowTid.addItemListener(m_itemListener);
         m_chkEnableShowTag.addItemListener(m_itemListener);
         m_chkEnableRemoveTag.addItemListener(m_itemListener);
 
@@ -831,10 +821,6 @@ addDesc(" ");
         m_chkEnableShowTag.setBackground(new Color(60,69,86));
         m_chkEnableRemoveTag    = new JCheckBox();
         m_chkEnableRemoveTag.setBackground(new Color(60,69,86));
-        m_chkEnableShowPid      = new JCheckBox();
-        m_chkEnableShowPid.setBackground(new Color(60,69,86));
-        m_chkEnableShowTid      = new JCheckBox();
-        m_chkEnableShowTid.setBackground(new Color(60,69,86));
 
         //Text Field
         
@@ -859,22 +845,10 @@ addDesc(" ");
         m_tfRemoveTag.setForeground(Color.WHITE);
         m_tfRemoveTag.setBackground(new Color(37,37,37));
         
-        m_tfShowPid     = new JTextField();
-        m_tfShowPid.setBorder(new EmptyBorder(5, 5, 5, 5));
-        m_tfShowPid.setForeground(Color.WHITE);
-        m_tfShowPid.setBackground(new Color(37,37,37));
-        
-        m_tfShowTid     = new JTextField();
-        m_tfShowTid.setSize(new Dimension(30, 0));
-        m_tfShowTid.setBorder(new EmptyBorder(5, 5, 5, 5));
-        m_tfShowTid.setForeground(new Color(245, 255, 250));
-        m_tfShowTid.setBackground(new Color(37,37,37));
-        
 
         JPanel jpMain = new JPanel(new BorderLayout());
 
         JPanel jpWordFilter = new JPanel(new BorderLayout());
-        jpWordFilter.setPreferredSize(new Dimension(0, 150));
         jpWordFilter.setBackground(new Color(60,69,86));
         jpWordFilter.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Text Filter", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(189, 147, 249)));        
 
@@ -884,7 +858,7 @@ addDesc(" ");
         JLabel find = new JLabel();
         find.setHorizontalAlignment(SwingConstants.LEFT);
         find.setFont(new Font("Tahoma", Font.BOLD, 12));
-        find.setForeground(new Color(245, 255, 250));
+        find.setForeground(Color.GREEN);
         find.setBackground(new Color(60,69,86));
         find.setText("  INCLUDE  ");
         jpFind.add(find, BorderLayout.WEST);
@@ -897,7 +871,7 @@ addDesc(" ");
         JLabel remove = new JLabel();
         
         remove.setFont(new Font("Tahoma", Font.BOLD, 12));
-        remove.setForeground(new Color(245, 255, 250));
+        remove.setForeground(Color.CYAN);
         remove.setBackground(new Color(60,69,86));
         remove.setText("  EXCLUDE  ");
         jpRemove.add(remove, BorderLayout.WEST);
@@ -906,110 +880,24 @@ addDesc(" ");
 
         jpWordFilter.add(jpFind, BorderLayout.NORTH);
         jpWordFilter.add(jpRemove);
-        
-        panel_1 = new JPanel((LayoutManager) null);
-        panel_1.setBackground(new Color(60, 69, 86));
-        jpRemove.add(panel_1, BorderLayout.SOUTH);
-        panel_1.setLayout(new BorderLayout());
 
-        jpMain.add(jpWordFilter, BorderLayout.CENTER);
-        
-        panel_3 = new JPanel();
-        panel_3.setBorder(new EmptyBorder(0, 0, 65, 0));
-        panel_3.setSize(new Dimension(200, 0));
-        panel_3.setBackground(new Color(60,69,86));
-        jpWordFilter.add(panel_3, BorderLayout.SOUTH);
-        //  for ( int i = 0; i < fonts.length; i++ )
-     //   {
-         //     m_jcFontType.addItem(fonts[i]);
-     //   }
+        jpMain.add(jpWordFilter, BorderLayout.NORTH);
 
-
-          JLabel jlFont = new JLabel("Font Size");
-          jlFont.setHorizontalAlignment(SwingConstants.LEFT);
-          panel_3.add(jlFont);
-          jlFont.setForeground(Color.WHITE);
-        m_tfFontSize = new JTextField(2);
-        m_tfFontSize.setToolTipText("");
-        m_tfFontSize.setForeground(Color.WHITE);
-        m_tfFontSize.setBackground(Color.BLACK);
-        panel_3.add(m_tfFontSize);
-        m_tfFontSize.setHorizontalAlignment(SwingConstants.RIGHT);
-        m_tfFontSize.setText("12");
-        
-                m_btnSetFont = new JButton("UPDATE");
-                panel_3.add(m_btnSetFont);
-                m_btnSetFont.setFont(new Font("Arial Black", Font.BOLD, 12));
-                m_btnSetFont.setForeground(Color.WHITE);
-                m_btnSetFont.setBackground(new Color(37,37,37));
-                m_btnSetFont.setOpaque(true);
-                m_btnSetFont.setBorderPainted(false);
-                m_btnSetFont.setMargin(new Insets(0, 0, 0, 0));
-                m_btnSetFont.addActionListener(m_alButtonListener);
-        
-                JLabel jlGoto = new JLabel("GO TO");
-                panel_3.add(jlGoto);
-                jlGoto.setForeground(new Color(245, 255, 250));
-        final JTextField tfGoto = new JTextField(6);
-        tfGoto.setForeground(Color.WHITE);
-        tfGoto.setBackground(Color.BLACK);
-        panel_3.add(tfGoto);
-        tfGoto.setHorizontalAlignment(SwingConstants.RIGHT);
-        tfGoto.addCaretListener(new CaretListener(){
-            public void caretUpdate(CaretEvent e)
-            {
-                try
-                {
-                    int nIndex = Integer.parseInt(tfGoto.getText()) - 1;
-                    m_tbLogTable.showRow(nIndex, false);
-                }
-                catch(Exception err)
-                {
-                }
-            }
-        });
-
-        JPanel jpTagFilter = new JPanel(new GridLayout(4, 1));
-        jpTagFilter.setPreferredSize(new Dimension(350, 200));
+        JPanel jpTagFilter = new JPanel(new GridLayout(2, 1));
         jpTagFilter.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Tag Filter", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(189, 147, 249)));
         jpTagFilter.setForeground(new Color(245, 255, 250));
         jpTagFilter.setBackground(new Color(60, 69, 86));
-
-        JPanel jpPid = new JPanel(new BorderLayout());
-        jpPid.setBorder(new EmptyBorder(5, 5, 5, 5));
-        jpPid.setBackground(new Color(60, 69, 86));
-        
-	        JLabel pid = new JLabel();
-	        pid.setFont(new Font("Arial", Font.BOLD, 13));
-	        pid.setForeground(new Color(245, 255, 250));
-	        pid.setBackground(new Color(60, 69, 86));
-	        pid.setText("  PID          ");
-	        jpPid.add(pid, BorderLayout.WEST);
-	        jpPid.add(m_tfShowPid, BorderLayout.CENTER);
-	        jpPid.add(m_chkEnableShowPid, BorderLayout.EAST);
-
-        JPanel jpTid = new JPanel(new BorderLayout());
-        jpTid.setBorder(new EmptyBorder(5, 5, 5, 5));
-        jpTid.setBackground(new Color(60,69,86));
-        
-        JLabel tid = new JLabel();
-        tid.setFont(new Font("Arial", Font.BOLD, 13));
-        tid.setForeground(new Color(245, 255, 250));
-        tid.setBackground(new Color(60, 69, 86));
-        tid.setText("  TID          ");
-        jpTid.add(tid, BorderLayout.WEST);
-        jpTid.add(m_tfShowTid, BorderLayout.CENTER);
-        jpTid.add(m_chkEnableShowTid, BorderLayout.EAST);
 
         JPanel jpShow = new JPanel(new BorderLayout());
         jpShow.setBorder(new EmptyBorder(5, 5, 5, 5));
         jpShow.setBackground(new Color(60,69,86));
         
         JLabel show = new JLabel();
-        show.setFont(new Font("Arial", Font.BOLD, 13));
-        show.setForeground(new Color(245, 255, 250));
+        show.setHorizontalAlignment(SwingConstants.LEFT);
+        show.setFont(new Font("Tahoma", Font.BOLD, 12));
+        show.setForeground(Color.GREEN);
         show.setBackground(new Color(60,69,86));
-        show.setText("  INCLUDE  ");
+        show.setText(" INCLUDE  ");
         jpShow.add(show, BorderLayout.WEST);
         jpShow.add(m_tfShowTag, BorderLayout.CENTER);
         jpShow.add(m_chkEnableShowTag, BorderLayout.EAST);
@@ -1018,19 +906,17 @@ addDesc(" ");
         jpRemoveTag.setBorder(new EmptyBorder(5, 5, 5, 5));
         jpRemoveTag.setBackground(new Color(60,69,86));
         JLabel removeTag = new JLabel();
-        removeTag.setFont(new Font("Arial", Font.BOLD, 13));
-        removeTag.setForeground(new Color(245, 255, 250));
-        removeTag.setText("  EXCLUDE ");
+        removeTag.setHorizontalAlignment(SwingConstants.LEFT);
+        removeTag.setFont(new Font("Tahoma", Font.BOLD, 12));
+        removeTag.setForeground(Color.CYAN);
+        removeTag.setText(" EXCLUDE  ");
         jpRemoveTag.add(removeTag, BorderLayout.WEST);
         jpRemoveTag.add(m_tfRemoveTag, BorderLayout.CENTER);
         jpRemoveTag.add(m_chkEnableRemoveTag, BorderLayout.EAST);
-
-        jpTagFilter.add(jpPid);
-        jpTagFilter.add(jpTid);
         jpTagFilter.add(jpShow);
         jpTagFilter.add(jpRemoveTag);
 
-        jpMain.add(jpTagFilter, BorderLayout.EAST);
+        jpMain.add(jpTagFilter, BorderLayout.SOUTH);
 
         return jpMain;
     }
@@ -1052,7 +938,7 @@ addDesc(" ");
     {
         JPanel optionFilter = new JPanel(new BorderLayout());
 
-        optionFilter.add(getCmdPanel(), BorderLayout.WEST);
+        optionFilter.add(getCmdPanel(), BorderLayout.NORTH);
         optionFilter.add(getCheckPanel(), BorderLayout.EAST);
         optionFilter.add(getFilterPanel(), BorderLayout.CENTER);
 
@@ -1065,15 +951,14 @@ addDesc(" ");
         optionMenu.setBackground(new Color(60,69,86));
         optionMenu.setForeground(new Color(37,37,37));
         JPanel optionWest = new JPanel();
-        FlowLayout flowLayout = (FlowLayout) optionWest.getLayout();
-        flowLayout.setAlignment(FlowLayout.RIGHT);
         optionWest.setBackground(new Color(60,69,86));
         String fonts[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
 
-        JLabel jlProcessCmd = new JLabel("Cmd : ");
+        JLabel jlProcessCmd = new JLabel("     Logcat command");
         jlProcessCmd.setForeground(new Color(245, 255, 250));
         m_comboCmd = new JComboBox();
         m_comboCmd.setPreferredSize( new Dimension( 180, 25) );
+        optionWest.setLayout(new GridLayout(0, 3, 0, 0));
         optionWest.add(jlProcessCmd);
         optionWest.add(m_comboCmd);
 
@@ -1204,7 +1089,7 @@ addDesc(" ");
                                                                                                       
                                                                                                               JPanel jpShowColumn = new JPanel();
                                                                                                               jpShowColumn.setFont(new Font("Arial Black", Font.BOLD, 14));
-                                                                                                              optionMenu.add(jpShowColumn, BorderLayout.WEST);
+                                                                                                              optionMenu.add(jpShowColumn, BorderLayout.CENTER);
                                                                                                               //60, 69, 86)
                                                                                                               
                                                                                                               jpShowColumn.setBackground(new Color(60, 69, 86));
@@ -1263,13 +1148,12 @@ addDesc(" ");
                                                                                                                       m_chkFatal.setForeground(new Color(242, 242, 242));
                                                                                                                       
                                                                                                                               JPanel jpLogFilter = new JPanel();
-                                                                                                                              optionMenu.add(jpLogFilter, BorderLayout.EAST);
+                                                                                                                              optionMenu.add(jpLogFilter, BorderLayout.WEST);
                                                                                                                               jpLogFilter.setBackground(new Color(60, 69, 86));
                                                                                                                               jpLogFilter.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
                                                                                                                               jpLogFilter.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Log Display Settings", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(189, 147, 249)));
                                                                                                                               
                                                                                                                               m_chkVerbose.setText("Verbose");
-                                                                                                                              m_chkVerbose.setSelected(true);
                                                                                                                               m_chkDebug.setText("Debug");
                                                                                                                               m_chkDebug.setSelected(true);
                                                                                                                               m_chkInfo.setText("Info");
@@ -1294,9 +1178,6 @@ addDesc(" ");
         JPanel optionMain = new JPanel(new BorderLayout());
 
         optionMain.add(getOptionFilter(), BorderLayout.CENTER);
-        
-        panel = new Panel();
-        optionMain.add(panel, BorderLayout.NORTH);
         optionMain.add(getOptionMenu(), BorderLayout.SOUTH);
 
         return optionMain;
@@ -1527,10 +1408,10 @@ addDesc(" ");
             m_tbLogTable.setFilterFind(checkBox.isSelected() ? m_tfFindWord.getText() : "");
         if(checkBox.equals(m_chkEnableRemove))
             m_tbLogTable.SetFilterRemove(checkBox.isSelected() ? m_tfRemoveWord.getText() : "");
-        if(checkBox.equals(m_chkEnableShowPid))
-            m_tbLogTable.SetFilterShowPid(checkBox.isSelected() ? m_tfShowPid.getText() : "");
-        if(checkBox.equals(m_chkEnableShowTid))
-            m_tbLogTable.SetFilterShowTid(checkBox.isSelected() ? m_tfShowTid.getText() : "");
+      //  if(checkBox.equals(m_chkEnableShowPid))
+       //     m_tbLogTable.SetFilterShowPid(checkBox.isSelected() ? m_tfShowPid.getText() : "");
+        //if(checkBox.equals(m_chkEnableShowTid))
+       //     m_tbLogTable.SetFilterShowTid(checkBox.isSelected() ? m_tfShowTid.getText() : "");
         if(checkBox.equals(m_chkEnableShowTag))
             m_tbLogTable.SetFilterShowTag(checkBox.isSelected() ? m_tfShowTag.getText() : "");
         if(checkBox.equals(m_chkEnableRemoveTag))
@@ -2026,8 +1907,8 @@ addDesc(" ");
         if(!m_ipIndicator.m_chBookmark.isSelected()
             && !m_ipIndicator.m_chError.isSelected()
             && checkLogLVFilter(new LogInfo())
-            && (m_tbLogTable.GetFilterShowPid().length() == 0   || !m_chkEnableShowPid.isSelected())
-            && (m_tbLogTable.GetFilterShowTid().length() == 0   || !m_chkEnableShowTid.isSelected())
+           // && (m_tbLogTable.GetFilterShowPid().length() == 0   || !m_chkEnableShowPid.isSelected())
+           // && (m_tbLogTable.GetFilterShowTid().length() == 0   || !m_chkEnableShowTid.isSelected())
             && (m_tbLogTable.GetFilterShowTag().length() == 0   || !m_chkEnableShowTag.isSelected())
             && (m_tbLogTable.GetFilterRemoveTag().length() == 0 || !m_chkEnableRemoveTag.isSelected())
             && (m_tbLogTable.GetFilterFind().length() == 0      || !m_chkEnableFind.isSelected())
@@ -2045,11 +1926,11 @@ addDesc(" ");
         {
             if(e.getSource().equals(m_btnDevice))
                 setDeviceList();
-            else if(e.getSource().equals(m_btnSetFont))
-            {
-                m_tbLogTable.setFontSize(Integer.parseInt(m_tfFontSize.getText()));
-                updateTable(-1, false);
-            }
+//            else if(e.getSource().equals(m_btnSetFont))
+//            {
+//                m_tbLogTable.setFontSize(Integer.parseInt(m_tfFontSize.getText()));
+//                updateTable(-1, false);
+//            }
             else if(e.getSource().equals(m_btnRun))
             {
                 startProcess();
@@ -2073,7 +1954,7 @@ addDesc(" ");
                 T.d("font = " + m_tbLogTable.getFont());
                 
              //   m_tbLogTable.setFont(new Font((String)m_jcFontType.getSelectedItem(), Font.PLAIN, 12));
-                m_tbLogTable.setFontSize(Integer.parseInt(m_tfFontSize.getText()));
+               // m_tbLogTable.setFontSize(Integer.parseInt(m_tfFontSize.getText()));
             }
         }
     };
@@ -2119,10 +2000,10 @@ addDesc(" ");
                     m_tbLogTable.setFilterFind(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
                 else if(arg0.getDocument().equals(m_tfRemoveWord.getDocument()) && m_chkEnableRemove.isSelected())
                     m_tbLogTable.SetFilterRemove(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
-                else if(arg0.getDocument().equals(m_tfShowPid.getDocument()) && m_chkEnableShowPid.isSelected())
-                    m_tbLogTable.SetFilterShowPid(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
-                else if(arg0.getDocument().equals(m_tfShowTid.getDocument()) && m_chkEnableShowTid.isSelected())
-                    m_tbLogTable.SetFilterShowTid(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
+              //  else if(arg0.getDocument().equals(m_tfShowPid.getDocument()) && m_chkEnableShowPid.isSelected())
+               //     m_tbLogTable.SetFilterShowPid(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
+              //  else if(arg0.getDocument().equals(m_tfShowTid.getDocument()) && m_chkEnableShowTid.isSelected())
+                //    m_tbLogTable.SetFilterShowTid(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
                 else if(arg0.getDocument().equals(m_tfShowTag.getDocument()) && m_chkEnableShowTag.isSelected())
                     m_tbLogTable.SetFilterShowTag(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
                 else if(arg0.getDocument().equals(m_tfRemoveTag.getDocument()) && m_chkEnableRemoveTag.isSelected())
@@ -2146,10 +2027,10 @@ addDesc(" ");
                     m_tbLogTable.setFilterFind(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
                 else if(arg0.getDocument().equals(m_tfRemoveWord.getDocument()) && m_chkEnableRemove.isSelected())
                     m_tbLogTable.SetFilterRemove(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
-                else if(arg0.getDocument().equals(m_tfShowPid.getDocument()) && m_chkEnableShowPid.isSelected())
-                    m_tbLogTable.SetFilterShowPid(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
-                else if(arg0.getDocument().equals(m_tfShowTid.getDocument()) && m_chkEnableShowTid.isSelected())
-                    m_tbLogTable.SetFilterShowTid(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
+//                else if(arg0.getDocument().equals(m_tfShowPid.getDocument()) && m_chkEnableShowPid.isSelected())
+//                    m_tbLogTable.SetFilterShowPid(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
+//                else if(arg0.getDocument().equals(m_tfShowTid.getDocument()) && m_chkEnableShowTid.isSelected())
+//                    m_tbLogTable.SetFilterShowTid(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
                 else if(arg0.getDocument().equals(m_tfShowTag.getDocument()) && m_chkEnableShowTag.isSelected())
                     m_tbLogTable.SetFilterShowTag(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
                 else if(arg0.getDocument().equals(m_tfRemoveTag.getDocument()) && m_chkEnableRemoveTag.isSelected())
@@ -2173,10 +2054,10 @@ addDesc(" ");
                     m_tbLogTable.setFilterFind(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
                 else if(arg0.getDocument().equals(m_tfRemoveWord.getDocument()) && m_chkEnableRemove.isSelected())
                     m_tbLogTable.SetFilterRemove(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
-                else if(arg0.getDocument().equals(m_tfShowPid.getDocument()) && m_chkEnableShowPid.isSelected())
-                    m_tbLogTable.SetFilterShowPid(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
-                else if(arg0.getDocument().equals(m_tfShowTid.getDocument()) && m_chkEnableShowTid.isSelected())
-                    m_tbLogTable.SetFilterShowTid(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
+//                else if(arg0.getDocument().equals(m_tfShowPid.getDocument()) && m_chkEnableShowPid.isSelected())
+//                    m_tbLogTable.SetFilterShowPid(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
+//                else if(arg0.getDocument().equals(m_tfShowTid.getDocument()) && m_chkEnableShowTid.isSelected())
+      //              m_tbLogTable.SetFilterShowTid(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
                 else if(arg0.getDocument().equals(m_tfShowTag.getDocument()) && m_chkEnableShowTag.isSelected())
                     m_tbLogTable.SetFilterShowTag(arg0.getDocument().getText(0, arg0.getDocument().getLength()));
                 else if(arg0.getDocument().equals(m_tfRemoveTag.getDocument()) && m_chkEnableRemoveTag.isSelected())
@@ -2229,18 +2110,15 @@ addDesc(" ");
                 m_tbLogTable.showColumn(LogFilterTableModel.COMUMN_MESSAGE, check.isSelected());
             else if(check.equals(m_chkEnableFind)
                     || check.equals(m_chkEnableRemove)
-                    || check.equals(m_chkEnableShowPid)
-                    || check.equals(m_chkEnableShowTid)
+//                    || check.equals(m_chkEnableShowPid)
+//                    || check.equals(m_chkEnableShowTid)
                     || check.equals(m_chkEnableShowTag)
                     || check.equals(m_chkEnableRemoveTag))
               //      || check.equals(m_chkEnableHighlight))
                 useFilter(check);
         }
     };
-    private Panel panel;
-    private JPanel panel_1;
     private JPanel panel_2;
-    private JPanel panel_3;
     
     public void openFileBrowser()
     {

@@ -90,7 +90,7 @@ public class LogTable extends JTable implements FocusListener, ActionListener
         KeyStroke copy = KeyStroke.getKeyStroke(KeyEvent.VK_C,ActionEvent.CTRL_MASK,false);
         registerKeyboardAction(this,"Copy",copy,JComponent.WHEN_FOCUSED);
 
-        addFocusListener( this );
+        addFocusListener(this);
         setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 //        setTableHeader(createTableHeader());
 //        getTableHeader().setReorderingAllowed(false);
